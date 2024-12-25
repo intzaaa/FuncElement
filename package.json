@@ -1,6 +1,6 @@
 {
   "name": "@fune/fune",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Build scalable web pages with declarative functions.",
   "scripts": {
     "build": "tsup",

@@ -4,6 +4,7 @@ import type { Final, ReadonlySignal } from "./lib/lib_export";
 import { signal } from "./lib/lib_export";
 import { element } from "./element";
 import { plain_matcher } from "./lib/router_matchers";
+import { config } from "./config";
 
 export type RouteData = {
   location: URL;
@@ -20,7 +21,7 @@ export type RouteEntry = {
 
 const registry: RouteEntry[] = [];
 
-const _location = signal<URL>(new URL(window.location.href));
+const _location = signal<URL>(new URL(config.window.location.href));
 
 export const location: ReadonlySignal<URL> = _location;
 
@@ -47,15 +48,15 @@ const match = (path: string) => {
   return entry ? entry.element : null;
 };
 
-window.onpopstate = () => {
-  _location.value = new URL(window.location.href);
+config.window.onpopstate = () => {
+  _location.value = new URL(config.window.location.href);
 };
 
 /**
  * Router Root Element
  */
 export const create_router = (fallback?: RouteElement) => {
-  const defaultFallback: RouteElement = () => element("div", {}, ["404 Not Found"]);
+  const default_fallback: RouteElement = () => element("div", {}, ["404 Not Found"]);
 
   return element(
     "div",
@@ -71,11 +72,11 @@ export const create_router = (fallback?: RouteElement) => {
             return;
           }
 
-          const url = new URL(event.target.href, window.location.href);
+          const url = new URL(event.target.href, config.window.location.href);
           if (_location.value.href !== event.target.href && _location.value.origin === url.origin) {
             event.preventDefault();
             _location.value = url;
-            window.history.pushState({}, "", _location.value.href);
+            config.window.history.pushState({}, "", _location.value.href);
           }
         }
       },
@@ -83,7 +84,7 @@ export const create_router = (fallback?: RouteElement) => {
     [
       () => {
         const loc = _location.value;
-        return (match(loc.pathname) || (fallback ?? defaultFallback))({
+        return (match(loc.pathname) || (fallback ?? default_fallback))({
           location: loc,
         });
       },
