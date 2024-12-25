@@ -1,10 +1,10 @@
 import { is } from "ramda";
-import { Final, StaticFinal } from "./type";
+import { Final } from "./final_types";
 import { Signal } from "@preact/signals-core";
 
 export const STOP = Symbol("STOP");
 
-export const value = <T>(val: Final<T> | StaticFinal<T>): T => {
+export const value = <T>(val: Final<T>): T => {
   if (is(Function, val)) {
     return value(val());
   } else if (is(Signal, val)) {

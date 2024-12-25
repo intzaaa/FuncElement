@@ -1,6 +1,6 @@
 {
   "name": "@fune/fune",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Forget about boring objects and HTML. Build scalable web pages with declarative functions.",
   "scripts": {
     "build": "tsup",
@@ -26,10 +26,10 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/_.js"
+      "import": "./dist/export.js"
     },
     "./dev": {
-      "import": "./src/_.ts"
+      "import": "./src/export.ts"
     }
   },
   "files": [

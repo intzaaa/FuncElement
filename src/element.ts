@@ -1,69 +1,55 @@
 import type CSS from "csstype";
 
-import type { Final, StaticFinal } from "./lib/type";
-import { effect } from "./lib/_";
-import { diff } from "./lib/diff";
-import { value, assign } from "./lib/util";
+import type { Final, StaticFinal } from "./lib/final_types";
+import { effect } from "./lib/lib_export";
+import { value, assign } from "./lib/utils";
 
 type Override<What, With> = Omit<What, keyof With> & With;
 
 /**
  * Declare a HTML Element
  */
-export const E = <T extends keyof HTMLElementTagNameMap>(
+export const element = <T extends keyof HTMLElementTagNameMap>(
   tag: StaticFinal<T>,
   atr?: Final<
     Partial<
       Override<
         HTMLElementTagNameMap[T],
         {
-          style: Partial<CSS.PropertiesHyphenFallback>;
+          style: Partial<CSS.Properties>;
           action: (self: HTMLElementTagNameMap[T]) => void;
         }
       >
     >
   >,
-  sub?: Final<Final<any>[]>
-) => {
-  const element = document.createElement(value(tag));
+  sub?: StaticFinal<Final<any>[]>
+): HTMLElementTagNameMap[T] => {
+  const ele = document.createElement(value(tag));
 
   effect(() => {
-    if (atr) assign(value, element, value(atr));
+    if (atr) assign(value, ele, value(atr));
   });
 
-  effect(() => {
-    const before = Array.from(element.childNodes);
-    const hold: number[] = [];
-    const after = (sub ? value(sub) : [])
-      .map((e) => value(e))
-      .filter((x) => !(x === null || x === undefined))
-      .map((x) => {
-        if (!(x instanceof Node)) {
-          return new Text(String(x));
+  if (sub !== undefined) {
+    for (const item of value(sub)) {
+      let last: Node | undefined = undefined;
+
+      effect(() => {
+        const curr = value(item);
+        const node = curr instanceof Node ? curr : document.createTextNode(String(curr));
+
+        if (last == undefined) {
+          last = ele.appendChild(node);
         } else {
-          return x;
+          ele.replaceChild(node, last);
         }
-      })
-      .map((x) => {
-        return (
-          before.find((y, i) => {
-            const isEqu = x.isEqualNode(y);
-            const isHold = hold.includes(i);
-            const result = isEqu && !isHold;
-
-            if (result) hold.push(i);
-
-            return result;
-          }) ?? x
-        );
       });
-
-    diff(element, before, after, (o: any) => o);
-  });
+    }
+  }
 
   effect(() => {
-    value(atr)?.action?.(element);
+    value(atr)?.action?.(ele);
   });
 
-  return element;
+  return ele;
 };

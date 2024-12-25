@@ -1,9 +1,9 @@
 import { isNil } from "ramda";
 
-import type { Final } from "./lib/_";
-import { computed, signal } from "./lib/_";
-import { E } from "./element";
-import { PM } from "./router-helper";
+import type { Final, ReadonlySignal } from "./lib/lib_export";
+import { signal } from "./lib/lib_export";
+import { element } from "./element";
+import { plain_matcher } from "./lib/router_matchers";
 
 export type RouteData = {
   location: URL;
@@ -18,47 +18,46 @@ export type RouteEntry = {
   element: RouteElement;
 };
 
-const registry = signal<RouteEntry[]>([]);
+const registry: RouteEntry[] = [];
 
-const location = signal<URL>(new URL(window.location.href));
+const _location = signal<URL>(new URL(window.location.href));
 
-export const Location = computed(() => location.value);
+export const location: ReadonlySignal<URL> = _location;
 
 /**
  * Declare a Route Entry
  */
-export const R = (items: [matcher: RouteMatcher | string, element: RouteElement][]) => {
-  registry.value = [
-    ...registry.value,
+export const router = (items: [matcher: RouteMatcher | string, element: RouteElement][]) => {
+  registry.push(
     ...items.map(([matcher, element]) => {
       if (typeof matcher === "string") {
         return {
-          matcher: PM(matcher),
+          matcher: plain_matcher(matcher),
           element,
         };
       } else {
         return { matcher, element };
       }
-    }),
-  ];
+    })
+  );
 };
 
 const match = (path: string) => {
-  const entry = registry.value.find(({ matcher }) => matcher(path));
+  const entry = registry.find(({ matcher }) => matcher(path));
   return entry ? entry.element : null;
 };
 
 window.onpopstate = () => {
-  location.value = new URL(window.location.href);
+  _location.value = new URL(window.location.href);
 };
 
 /**
  * Router Root Element
  */
-export const RouterRoot = (fallback?: RouteElement) => {
-  const defaultFallback: RouteElement = () => E("div", {}, ["404 Not Found"]);
+export const create_router = (fallback?: RouteElement) => {
+  const defaultFallback: RouteElement = () => element("div", {}, ["404 Not Found"]);
 
-  return E(
+  return element(
     "div",
     {
       style: {
@@ -73,17 +72,17 @@ export const RouterRoot = (fallback?: RouteElement) => {
           }
 
           const url = new URL(event.target.href, window.location.href);
-          if (location.value.href !== event.target.href && location.value.origin === url.origin) {
+          if (_location.value.href !== event.target.href && _location.value.origin === url.origin) {
             event.preventDefault();
-            location.value = url;
-            window.history.pushState({}, "", location.value.href);
+            _location.value = url;
+            window.history.pushState({}, "", _location.value.href);
           }
         }
       },
     },
     [
       () => {
-        const loc = location.value;
+        const loc = _location.value;
         return (match(loc.pathname) || (fallback ?? defaultFallback))({
           location: loc,
         });
