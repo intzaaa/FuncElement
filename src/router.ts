@@ -1,6 +1,6 @@
 import { isNil } from "ramda";
 
-import type { Final, ReadonlySignal } from "./lib/lib_export";
+import type { Final } from "./lib/lib_export";
 import { signal } from "./lib/lib_export";
 import { element } from "./element";
 import { plain_matcher } from "./lib/router_matchers";
@@ -21,9 +21,12 @@ export type RouteEntry = {
 
 const registry: RouteEntry[] = [];
 
-const _location = signal<URL>(new URL(config.window.location.href));
-
-export const location: ReadonlySignal<URL> = _location;
+export const location = signal<URL>(
+  config.location
+    ? new URL(config.location.href)
+    : // Undefined Behavior
+      (undefined as any)
+);
 
 /**
  * Declare a Route Entry
@@ -49,7 +52,7 @@ const match = (path: string) => {
 };
 
 config.window.onpopstate = () => {
-  _location.value = new URL(config.window.location.href);
+  location.value = new URL(config.window.location.href);
 };
 
 /**
@@ -73,17 +76,17 @@ export const create_router = (fallback?: RouteElement) => {
           }
 
           const url = new URL(event.target.href, config.window.location.href);
-          if (_location.value.href !== event.target.href && _location.value.origin === url.origin) {
+          if (location.value.href !== event.target.href && location.value.origin === url.origin) {
             event.preventDefault();
-            _location.value = url;
-            config.window.history.pushState({}, "", _location.value.href);
+            location.value = url;
+            config.window.history.pushState({}, "", location.value.href);
           }
         }
       },
     },
     [
       () => {
-        const loc = _location.value;
+        const loc = location.value;
         return (match(loc.pathname) || (fallback ?? default_fallback))({
           location: loc,
         });

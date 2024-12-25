@@ -1,6 +1,7 @@
 const default_config = {
   window: globalThis?.window,
   document: globalThis?.window?.document,
+  location: globalThis?.window?.location,
 } as const;
 
 export let config = default_config;

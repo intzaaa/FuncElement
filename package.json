@@ -1,11 +1,11 @@
 {
   "name": "@fune/fune",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Build scalable web pages with declarative functions.",
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
-    "ibp": "pnpm install && pnpm build && pnpm publish --registry=https://registry.npmjs.org --no-git-checks --access public"
+    "ibp": "pnpm install && pnpm build && pnpm publish --registry=https://registry.npmjs.org --access public"
   },
   "keywords": [],
   "author": "intza",
