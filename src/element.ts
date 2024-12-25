@@ -37,7 +37,7 @@ export const element = <T extends keyof HTMLElementTagNameMap>(
 
       effect(() => {
         const curr = value(item);
-        const node = curr instanceof Node ? curr : config.document.createTextNode(String(curr));
+        const node = curr instanceof config.window.Node ? curr : config.document.createTextNode(String(curr));
 
         if (last == undefined) {
           last = ele.appendChild(node);

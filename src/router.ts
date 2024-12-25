@@ -51,9 +51,11 @@ const match = (path: string) => {
   return entry ? entry.element : null;
 };
 
-config.window.onpopstate = () => {
-  location.value = new URL(config.window.location.href);
-};
+if (config?.window?.onpopstate) {
+  config.window.onpopstate = () => {
+    location.value = new URL(config.window.location.href);
+  };
+}
 
 /**
  * Router Root Element
