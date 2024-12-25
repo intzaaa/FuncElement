@@ -2,9 +2,9 @@ import { Final } from "./lib_export";
 import { computed, signal, batch, ReadonlySignal } from "./wrapper";
 
 /**
- * Conditional Element
+ * Condition Element
  */
-export const C = (items: [predicate: (() => boolean) | null, then: Final<HTMLElement>][]) => {
+export const condition = (items: [predicate: (() => boolean) | null, then: Final<HTMLElement>][]) => {
   return () => {
     const fallback = items.find(([predicate]) => predicate === null)?.[1];
 
@@ -17,7 +17,7 @@ type State = "processing" | "completed" | "errored";
 /**
  * Async Computation
  */
-export const A = <T>(task: (() => Promise<T>) | Promise<T>, handler: (state: ReadonlySignal<State>, data: ReadonlySignal<T | undefined>) => Final<any>) => {
+export const async = <T>(task: (() => Promise<T>) | Promise<T>, handler: (state: ReadonlySignal<State>, data: ReadonlySignal<T | undefined>) => Final<any>) => {
   const data = signal<T | undefined>();
   const state = signal<State>("processing");
   const result = handler(

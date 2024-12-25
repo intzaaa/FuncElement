@@ -3,6 +3,7 @@ import type CSS from "csstype";
 import type { Final, StaticFinal } from "./lib/final_types";
 import { effect } from "./lib/lib_export";
 import { value, assign } from "./lib/utils";
+import { config } from "./config";
 
 type Override<What, With> = Omit<What, keyof With> & With;
 
@@ -24,7 +25,7 @@ export const element = <T extends keyof HTMLElementTagNameMap>(
   >,
   sub?: StaticFinal<Final<any>[]>
 ): HTMLElementTagNameMap[T] => {
-  const ele = document.createElement(value(tag));
+  const ele = config.document.createElement(value(tag));
 
   effect(() => {
     if (atr) assign(value, ele, value(atr));
@@ -36,7 +37,7 @@ export const element = <T extends keyof HTMLElementTagNameMap>(
 
       effect(() => {
         const curr = value(item);
-        const node = curr instanceof Node ? curr : document.createTextNode(String(curr));
+        const node = curr instanceof Node ? curr : config.document.createTextNode(String(curr));
 
         if (last == undefined) {
           last = ele.appendChild(node);

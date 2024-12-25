@@ -1,7 +1,7 @@
 {
   "name": "@fune/fune",
-  "version": "1.0.0",
-  "description": "Forget about boring objects and HTML. Build scalable web pages with declarative functions.",
+  "version": "1.0.2",
+  "description": "Build scalable web pages with declarative functions.",
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
